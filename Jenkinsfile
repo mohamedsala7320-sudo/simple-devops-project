@@ -9,14 +9,6 @@ pipeline {
             }
         }
 
-        stage('Build Application') {
-            steps {
-                dir('app') {
-                    bat '.\\mvnw.cmd clean package'
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 dir('app') {
