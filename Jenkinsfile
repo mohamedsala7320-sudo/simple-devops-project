@@ -3,19 +3,39 @@ pipeline {
 
     stages {
 
-        stage('Clone') {
+        stage('Clone Repository') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/mohamedsala7320-sudo/simple-devops-project.git'
+                echo 'Repository already cloned by Jenkins'
             }
         }
 
-        stage('Build') {
+        stage('Build Application') {
             steps {
                 dir('app') {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw clean package'
+                    bat '.\\mvnw.cmd clean package'
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('app') {
+                    bat 'docker build -t mosala7320/springboot-demo:v1 .'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                bat 'docker push mosala7320/springboot-demo:v1'
+            }
+        }
+
+        stage('Deploy To Kubernetes') {
+            steps {
+                bat 'kubectl apply -f kubernetes\\deployment.yaml'
+                bat 'kubectl apply -f kubernetes\\service.yaml'
+                bat 'kubectl rollout restart deployment springboot-demo'
             }
         }
     }
